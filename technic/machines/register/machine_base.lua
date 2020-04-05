@@ -4,22 +4,26 @@ local S = technic.getter
 local fs_helpers = pipeworks.fs_helpers
 local tube_entry = "^pipeworks_tube_connection_metallic.png"
 
-local tube = {
-	insert_object = function(pos, node, stack, direction)
-		local meta = minetest.get_meta(pos)
-		local inv = meta:get_inventory()
-		return inv:add_item("src", stack)
-	end,
-	can_insert = function(pos, node, stack, direction)
-		local meta = minetest.get_meta(pos)
-		local inv = meta:get_inventory()
-		if meta:get_int("splitstacks") == 1 then
-			stack = stack:peek_item(1)
-		end
-		return inv:room_for_item("src", stack)
-	end,
-	connect_sides = {left = 1, right = 1, back = 1, top = 1, bottom = 1},
-}
+function technic.default_can_insert(pos, node, stack, direction)
+	local meta = minetest.get_meta(pos)
+	local inv = meta:get_inventory()
+	if meta:get_int("splitstacks") == 1 then
+		stack = stack:peek_item(1)
+	end
+	return inv:room_for_item("src", stack)
+end
+
+function technic.new_default_tube()
+	return {
+		insert_object = function(pos, node, stack, direction)
+			local meta = minetest.get_meta(pos)
+			local inv = meta:get_inventory()
+			return inv:add_item("src", stack)
+		end,
+		can_insert = technic.default_can_insert,
+		connect_sides = {left = 1, right = 1, back = 1, top = 1, bottom = 1},
+	}
+end
 
 local connect_default = {"bottom", "back", "left", "right"}
 
@@ -44,7 +48,7 @@ function technic.register_base_machine(data)
 	for k, v in pairs(groups) do active_groups[k] = v end
 
 	local formspec =
-		"invsize[8,9;]"..
+		"size[8,9;]"..
 		"list[current_name;src;"..(4-input_size)..",1;"..input_size..",1;]"..
 		"list[current_name;dst;5,1;2,2;]"..
 		"list[current_player;main;0,5;8,4;]"..
@@ -62,6 +66,14 @@ function technic.register_base_machine(data)
 			"listring[current_player;main]"..
 			"listring[current_name;upgrade2]"..
 			"listring[current_player;main]"
+	end
+
+	local tube = technic.new_default_tube()
+	if data.can_insert then
+		tube.can_insert = data.can_insert
+	end
+	if data.insert_object then
+		tube.insert_object = data.insert_object
 	end
 
 	local run = function(pos, node)
@@ -144,10 +156,11 @@ function technic.register_base_machine(data)
 	if ltier == "lv" then
 		tentry = ""
 	end
+
 	minetest.register_node("technic:"..ltier.."_"..machine_name, {
 		description = machine_desc:format(tier),
 		tiles = {
-			"technic_"..ltier.."_"..machine_name.."_top.png"..tentry, 
+			"technic_"..ltier.."_"..machine_name.."_top.png"..tentry,
 			"technic_"..ltier.."_"..machine_name.."_bottom.png"..tentry,
 			"technic_"..ltier.."_"..machine_name.."_side.png"..tentry,
 			"technic_"..ltier.."_"..machine_name.."_side.png"..tentry,

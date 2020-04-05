@@ -6,7 +6,7 @@ local fs_helpers = pipeworks.fs_helpers
 local tube_entry = "^pipeworks_tube_connection_metallic.png"
 
 local function inject_items (pos)
-		local meta=minetest.get_meta(pos) 
+		local meta=minetest.get_meta(pos)
 		local inv = meta:get_inventory()
 		local mode=meta:get_string("mode")
 		if mode=="single items" then
@@ -15,7 +15,7 @@ local function inject_items (pos)
 			i=i+1
 				if stack then
 				local item0=stack:to_table()
-				if item0 then 
+				if item0 then
 					item0["count"] = "1"
 					technic.tube_inject_item(pos, pos, vector.new(0, -1, 0), item0)
 					stack:take_item(1)
@@ -31,7 +31,7 @@ local function inject_items (pos)
 			i=i+1
 				if stack then
 				local item0=stack:to_table()
-				if item0 then 
+				if item0 then
 					technic.tube_inject_item(pos, pos, vector.new(0, -1, 0), item0)
 					stack:clear()
 					inv:set_stack("main", i, stack)
@@ -55,7 +55,7 @@ minetest.register_craft({
 local function set_injector_formspec(meta)
 	local is_stack = meta:get_string("mode") == "whole stacks"
 	meta:set_string("formspec",
-		"invsize[8,9;]"..
+		"size[8,9;]"..
 		"item_image[0,0;1,1;technic:injector]"..
 		"label[1,0;"..S("Self-Contained Injector").."]"..
 		(is_stack and
@@ -95,7 +95,7 @@ minetest.register_node("technic:injector", {
 			if meta:get_int("splitstacks") == 1 then
 				stack = stack:peek_item(1)
 			end
-			return meta:get_inventory():room_for_item("main", stack)
+			return inv:room_for_item("main", stack)
 		end,
 		insert_object = function(pos, node, stack, direction)
 			return minetest.get_meta(pos):get_inventory():add_item("main", stack)
@@ -142,7 +142,7 @@ minetest.register_abm({
 	chance = 1,
 	action = function(pos, node, active_object_count, active_object_count_wider)
 		local pos1 = vector.add(pos, vector.new(0, -1, 0))
-		local node1 = minetest.get_node(pos1) 
+		local node1 = minetest.get_node(pos1)
 		if minetest.get_item_group(node1.name, "tubedevice") > 0 then
 			inject_items(pos)
 		end

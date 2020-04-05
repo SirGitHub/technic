@@ -11,9 +11,12 @@ switching station handles the network activity.
 
 Helper functions
 ----------------
+* `technic.EU_string(num)`
+	* Converts num to a human-readable string (see pretty_num)
+	  and adds the `EU` unit
+	* Use this function when showing players energy values
 * `technic.pretty_num(num)`
-	* Converts the number `num` to a human-readable string.
-	* Use this function when showing players power values.
+	* Converts the number `num` to a human-readable string with SI prefixes
 * `technic.swap_node(pos, nodename)`
 	* Same as `mintest.swap_node` but it only changes the nodename.
 	* It uses `minetest.get_node` before swapping to ensure the new nodename
@@ -61,6 +64,10 @@ Registration functions
 ### Specific machines
 * `technic.register_solar_array(data)`
 	* data is a table
+* `technic.can_insert_unique_stack(pos, node, stack, direction)`
+* `technic.insert_object_unique_stack(pos, node, stack, direction)`
+	* Functions for the parameters `can_insert` and `insert_object` to avoid
+	  filling multiple inventory slots with same type of item.
 
 Used itemdef fields
 -------------------
